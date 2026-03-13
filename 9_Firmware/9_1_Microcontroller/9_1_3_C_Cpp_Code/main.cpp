@@ -620,8 +620,7 @@ SystemError_t checkSystemHealth(void) {
     // 4. Check IMU Communication
     static uint32_t last_imu_check = 0;
     if (HAL_GetTick() - last_imu_check > 10000) {
-        GY85_Update(&imu);
-        if (isnan(imu.ax) || isnan(imu.ay) || isnan(imu.az)) {
+        if (!GY85_Update(&imu)) {
             current_error = ERROR_IMU_COMM;
         }
         last_imu_check = HAL_GetTick();
@@ -1277,9 +1276,13 @@ int main(void)
 
 
 // Initialize module IMU
-  GY85_Init();
+  if (!GY85_Init()) {
+      Error_Handler();
+  }
   for(int i=0; i<10;i++){
-  GY85_Update(&imu);
+  if (!GY85_Update(&imu)) {
+      Error_Handler();
+  }
 
   ax = imu.ax;
   ay = imu.ay;

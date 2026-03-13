@@ -2,6 +2,7 @@
 #define __GY_85_HAL_H__
 
 #include "stm32f7xx_hal.h"   // change depending on MCU family
+#include <stdbool.h>
 #include <stdint.h>
 
 #define ADXL345_ADDR     (0x53 << 1)
@@ -18,8 +19,8 @@ typedef struct {
 } GY85_t;
 
 // Public API
-void GY85_Init(void);
-void GY85_Update(GY85_t *imu);   // reads all sensors and stores in struct
+bool GY85_Init(void);
+bool GY85_Update(GY85_t *imu);   // reads all sensors and stores in struct
 
 #endif
 
