@@ -27,6 +27,11 @@ wire chirp_start;
 wire azimuth_change;
 wire elevation_change;
 
+// Mode controller outputs → matched_filter_multi_segment
+wire mc_new_chirp;
+wire mc_new_elevation;
+wire mc_new_azimuth;
+
 wire [1:0] segment_request;
 wire mem_request;
 wire [15:0] ref_i, ref_q;
@@ -58,7 +63,35 @@ wire signed [15:0] decimated_range_q;
 wire decimated_range_valid;
 wire [5:0] decimated_range_bin;
 
+// ========== RADAR MODE CONTROLLER SIGNALS ==========
+wire rmc_scanning;
+wire rmc_scan_complete;
+wire [5:0] rmc_chirp_count;
+wire [5:0] rmc_elevation_count;
+wire [5:0] rmc_azimuth_count;
+
 // ========== MODULE INSTANTIATIONS ==========
+
+// 0. Radar Mode Controller — drives chirp/elevation/azimuth timing signals
+//    Default mode: auto-scan (2'b01). Change to 2'b00 for STM32 pass-through.
+radar_mode_controller rmc (
+    .clk(clk),
+    .reset_n(reset_n),
+    .mode(2'b01),                     // Auto-scan mode
+    .stm32_new_chirp(1'b0),           // Unused in auto mode
+    .stm32_new_elevation(1'b0),       // Unused in auto mode
+    .stm32_new_azimuth(1'b0),         // Unused in auto mode
+    .trigger(1'b0),                   // Unused in auto mode
+    .use_long_chirp(use_long_chirp),
+    .mc_new_chirp(mc_new_chirp),
+    .mc_new_elevation(mc_new_elevation),
+    .mc_new_azimuth(mc_new_azimuth),
+    .chirp_count(rmc_chirp_count),
+    .elevation_count(rmc_elevation_count),
+    .azimuth_count(rmc_azimuth_count),
+    .scanning(rmc_scanning),
+    .scan_complete(rmc_scan_complete)
+);
 reg clk_400m;
 
 lvds_to_cmos_400m clk_400m_inst(

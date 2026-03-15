@@ -2,6 +2,14 @@
 *.vvp
 *.vcd
 
+# Testbench CSV output (regenerated on each run)
+mf_chain_autocorr.csv
+rbd_mode00_ramp.csv
+rbd_mode01_peak.csv
+rbd_mode10_avg.csv
+rbd_mode10_ramp.csv
+rmc_autoscan.csv
+
 # macOS
 .DS_Store
 
