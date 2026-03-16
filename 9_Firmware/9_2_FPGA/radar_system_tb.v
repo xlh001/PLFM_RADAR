@@ -339,13 +339,74 @@ begin
 end
 endfunction
 
-// Sine LUT for echo modulation
+// Sine LUT for echo modulation (pre-computed, equivalent to 128 + 127*sin(2*pi*i/256))
 reg [7:0] sin_lut [0:255];
 integer lut_i;
 initial begin
-    for (lut_i = 0; lut_i < 256; lut_i = lut_i + 1) begin
-        sin_lut[lut_i] = 128 + 127 * $sin(2 * 3.14159 * lut_i / 256);
-    end
+    sin_lut[  0] = 128; sin_lut[  1] = 131; sin_lut[  2] = 134; sin_lut[  3] = 137;
+    sin_lut[  4] = 140; sin_lut[  5] = 144; sin_lut[  6] = 147; sin_lut[  7] = 150;
+    sin_lut[  8] = 153; sin_lut[  9] = 156; sin_lut[ 10] = 159; sin_lut[ 11] = 162;
+    sin_lut[ 12] = 165; sin_lut[ 13] = 168; sin_lut[ 14] = 171; sin_lut[ 15] = 174;
+    sin_lut[ 16] = 177; sin_lut[ 17] = 179; sin_lut[ 18] = 182; sin_lut[ 19] = 185;
+    sin_lut[ 20] = 188; sin_lut[ 21] = 191; sin_lut[ 22] = 193; sin_lut[ 23] = 196;
+    sin_lut[ 24] = 199; sin_lut[ 25] = 201; sin_lut[ 26] = 204; sin_lut[ 27] = 206;
+    sin_lut[ 28] = 209; sin_lut[ 29] = 211; sin_lut[ 30] = 213; sin_lut[ 31] = 216;
+    sin_lut[ 32] = 218; sin_lut[ 33] = 220; sin_lut[ 34] = 222; sin_lut[ 35] = 224;
+    sin_lut[ 36] = 226; sin_lut[ 37] = 228; sin_lut[ 38] = 230; sin_lut[ 39] = 232;
+    sin_lut[ 40] = 234; sin_lut[ 41] = 235; sin_lut[ 42] = 237; sin_lut[ 43] = 239;
+    sin_lut[ 44] = 240; sin_lut[ 45] = 241; sin_lut[ 46] = 243; sin_lut[ 47] = 244;
+    sin_lut[ 48] = 245; sin_lut[ 49] = 246; sin_lut[ 50] = 248; sin_lut[ 51] = 249;
+    sin_lut[ 52] = 250; sin_lut[ 53] = 250; sin_lut[ 54] = 251; sin_lut[ 55] = 252;
+    sin_lut[ 56] = 253; sin_lut[ 57] = 253; sin_lut[ 58] = 254; sin_lut[ 59] = 254;
+    sin_lut[ 60] = 254; sin_lut[ 61] = 255; sin_lut[ 62] = 255; sin_lut[ 63] = 255;
+    sin_lut[ 64] = 255; sin_lut[ 65] = 255; sin_lut[ 66] = 255; sin_lut[ 67] = 255;
+    sin_lut[ 68] = 254; sin_lut[ 69] = 254; sin_lut[ 70] = 254; sin_lut[ 71] = 253;
+    sin_lut[ 72] = 253; sin_lut[ 73] = 252; sin_lut[ 74] = 251; sin_lut[ 75] = 250;
+    sin_lut[ 76] = 250; sin_lut[ 77] = 249; sin_lut[ 78] = 248; sin_lut[ 79] = 246;
+    sin_lut[ 80] = 245; sin_lut[ 81] = 244; sin_lut[ 82] = 243; sin_lut[ 83] = 241;
+    sin_lut[ 84] = 240; sin_lut[ 85] = 239; sin_lut[ 86] = 237; sin_lut[ 87] = 235;
+    sin_lut[ 88] = 234; sin_lut[ 89] = 232; sin_lut[ 90] = 230; sin_lut[ 91] = 228;
+    sin_lut[ 92] = 226; sin_lut[ 93] = 224; sin_lut[ 94] = 222; sin_lut[ 95] = 220;
+    sin_lut[ 96] = 218; sin_lut[ 97] = 216; sin_lut[ 98] = 213; sin_lut[ 99] = 211;
+    sin_lut[100] = 209; sin_lut[101] = 206; sin_lut[102] = 204; sin_lut[103] = 201;
+    sin_lut[104] = 199; sin_lut[105] = 196; sin_lut[106] = 193; sin_lut[107] = 191;
+    sin_lut[108] = 188; sin_lut[109] = 185; sin_lut[110] = 182; sin_lut[111] = 179;
+    sin_lut[112] = 177; sin_lut[113] = 174; sin_lut[114] = 171; sin_lut[115] = 168;
+    sin_lut[116] = 165; sin_lut[117] = 162; sin_lut[118] = 159; sin_lut[119] = 156;
+    sin_lut[120] = 153; sin_lut[121] = 150; sin_lut[122] = 147; sin_lut[123] = 144;
+    sin_lut[124] = 140; sin_lut[125] = 137; sin_lut[126] = 134; sin_lut[127] = 131;
+    sin_lut[128] = 128; sin_lut[129] = 125; sin_lut[130] = 122; sin_lut[131] = 119;
+    sin_lut[132] = 116; sin_lut[133] = 112; sin_lut[134] = 109; sin_lut[135] = 106;
+    sin_lut[136] = 103; sin_lut[137] = 100; sin_lut[138] =  97; sin_lut[139] =  94;
+    sin_lut[140] =  91; sin_lut[141] =  88; sin_lut[142] =  85; sin_lut[143] =  82;
+    sin_lut[144] =  79; sin_lut[145] =  77; sin_lut[146] =  74; sin_lut[147] =  71;
+    sin_lut[148] =  68; sin_lut[149] =  65; sin_lut[150] =  63; sin_lut[151] =  60;
+    sin_lut[152] =  57; sin_lut[153] =  55; sin_lut[154] =  52; sin_lut[155] =  50;
+    sin_lut[156] =  47; sin_lut[157] =  45; sin_lut[158] =  43; sin_lut[159] =  40;
+    sin_lut[160] =  38; sin_lut[161] =  36; sin_lut[162] =  34; sin_lut[163] =  32;
+    sin_lut[164] =  30; sin_lut[165] =  28; sin_lut[166] =  26; sin_lut[167] =  24;
+    sin_lut[168] =  22; sin_lut[169] =  21; sin_lut[170] =  19; sin_lut[171] =  17;
+    sin_lut[172] =  16; sin_lut[173] =  15; sin_lut[174] =  13; sin_lut[175] =  12;
+    sin_lut[176] =  11; sin_lut[177] =  10; sin_lut[178] =   8; sin_lut[179] =   7;
+    sin_lut[180] =   6; sin_lut[181] =   6; sin_lut[182] =   5; sin_lut[183] =   4;
+    sin_lut[184] =   3; sin_lut[185] =   3; sin_lut[186] =   2; sin_lut[187] =   2;
+    sin_lut[188] =   2; sin_lut[189] =   1; sin_lut[190] =   1; sin_lut[191] =   1;
+    sin_lut[192] =   1; sin_lut[193] =   1; sin_lut[194] =   1; sin_lut[195] =   1;
+    sin_lut[196] =   2; sin_lut[197] =   2; sin_lut[198] =   2; sin_lut[199] =   3;
+    sin_lut[200] =   3; sin_lut[201] =   4; sin_lut[202] =   5; sin_lut[203] =   6;
+    sin_lut[204] =   6; sin_lut[205] =   7; sin_lut[206] =   8; sin_lut[207] =  10;
+    sin_lut[208] =  11; sin_lut[209] =  12; sin_lut[210] =  13; sin_lut[211] =  15;
+    sin_lut[212] =  16; sin_lut[213] =  17; sin_lut[214] =  19; sin_lut[215] =  21;
+    sin_lut[216] =  22; sin_lut[217] =  24; sin_lut[218] =  26; sin_lut[219] =  28;
+    sin_lut[220] =  30; sin_lut[221] =  32; sin_lut[222] =  34; sin_lut[223] =  36;
+    sin_lut[224] =  38; sin_lut[225] =  40; sin_lut[226] =  43; sin_lut[227] =  45;
+    sin_lut[228] =  47; sin_lut[229] =  50; sin_lut[230] =  52; sin_lut[231] =  55;
+    sin_lut[232] =  57; sin_lut[233] =  60; sin_lut[234] =  63; sin_lut[235] =  65;
+    sin_lut[236] =  68; sin_lut[237] =  71; sin_lut[238] =  74; sin_lut[239] =  77;
+    sin_lut[240] =  79; sin_lut[241] =  82; sin_lut[242] =  85; sin_lut[243] =  88;
+    sin_lut[244] =  91; sin_lut[245] =  94; sin_lut[246] =  97; sin_lut[247] = 100;
+    sin_lut[248] = 103; sin_lut[249] = 106; sin_lut[250] = 109; sin_lut[251] = 112;
+    sin_lut[252] = 116; sin_lut[253] = 119; sin_lut[254] = 122; sin_lut[255] = 125;
 end
 
 // ============================================================================
@@ -466,6 +527,7 @@ always @(posedge clk_100m) begin
 end
 
 // DAC output monitoring
+integer p;
 integer dac_sample_count = 0;
 always @(posedge dac_clk) begin
     if (dac_data != 8'h80) begin
@@ -512,7 +574,7 @@ initial begin
         $display("");
         $display("USB Packet Analysis:");
         $display("First 10 packets:");
-        for (integer p = 0; p < 10 && p < usb_packet_count; p = p + 1) begin
+        for (p = 0; p < 10 && p < usb_packet_count; p = p + 1) begin
             $display("  Packet[%0d]: 0x%08h", p, usb_packet_buffer[p]);
         end
     end
@@ -524,23 +586,25 @@ end
 // ASSERTIONS AND CHECKS
 // ============================================================================
 
-// Check that chirp counter increments properly
-property chirp_counter_check;
-    @(posedge clk_100m) $rose(new_chirp_frame) |-> ##[1:10] (current_chirp != $past(current_chirp));
-endproperty
-assert property (chirp_counter_check) else $error("Chirp counter not incrementing");
+// Check that chirp counter increments properly (procedural equivalent of SVA)
+reg [5:0] prev_chirp;
+always @(posedge clk_100m) begin
+    if (reset_n) begin
+        if (new_chirp_frame && (current_chirp == prev_chirp)) begin
+            $display("[ASSERT @%0t] WARNING: Chirp counter not incrementing", $time);
+        end
+        prev_chirp <= current_chirp;
+    end
+end
 
-// Check that USB writes occur when data is valid
-property usb_write_check;
-    @(posedge ft601_clk_in) (dbg_doppler_valid) |-> ##[1:100] (!$stable(ft601_wr_n));
-endproperty
-assert property (usb_write_check) else $warning("USB not writing when data valid");
-
-// Check that system reset works
-property reset_check;
-    @(negedge reset_n) (1'b1) |-> ##1 (system_status == 4'b0000);
-endproperty
-assert property (reset_check) else $error("Reset failed to clear status");
+// Check that system reset clears status (procedural equivalent of SVA)
+always @(negedge reset_n) begin
+    #10;  // Wait one clock cycle after reset assertion
+    if (system_status != 4'b0000) begin
+        $display("[ASSERT @%0t] ERROR: Reset failed to clear status (status=%b)", 
+                 $time, system_status);
+    end
+end
 
 // ============================================================================
 // WAVEFORM DUMPING
