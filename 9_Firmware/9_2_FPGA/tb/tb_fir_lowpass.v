@@ -109,8 +109,8 @@ module tb_fir_lowpass;
         saw_nonzero = 0;
         output_count = 0;
 
-        // Run for 40 clocks (need at least 32 for all taps + pipeline)
-        for (sample_count = 0; sample_count < 40; sample_count = sample_count + 1) begin
+        // Run for 44 clocks (need at least 32 for all taps + 9-stage pipeline)
+        for (sample_count = 0; sample_count < 44; sample_count = sample_count + 1) begin
             @(posedge clk); #1;
             if (data_out_valid) begin
                 $fwrite(csv_file, "%0d,%0d\n", output_count, data_out);
