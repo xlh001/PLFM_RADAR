@@ -133,6 +133,8 @@ typedef enum {
     SPY_TIM_PWM_START,
     SPY_TIM_PWM_STOP,
     SPY_TIM_SET_COMPARE,
+    SPY_SPI_TRANSMIT_RECEIVE,
+    SPY_SPI_TRANSMIT,
 } SpyCallType;
 
 typedef struct {
@@ -181,6 +183,11 @@ void          HAL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 uint32_t      HAL_GetTick(void);
 void          HAL_Delay(uint32_t Delay);
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+
+/* ========================= SPI stubs ============================== */
+
+HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);
 
 /* ========================= no_os compat layer ===================== */
 

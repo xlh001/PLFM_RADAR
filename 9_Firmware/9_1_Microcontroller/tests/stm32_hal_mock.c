@@ -264,6 +264,37 @@ void mock_tim_set_compare(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t Co
     });
 }
 
+/* ========================= SPI stubs ============================== */
+
+HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
+{
+    spy_push((SpyRecord){
+        .type  = SPY_SPI_TRANSMIT_RECEIVE,
+        .port  = NULL,
+        .pin   = Size,
+        .value = Timeout,
+        .extra = hspi
+    });
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+    spy_push((SpyRecord){
+        .type  = SPY_SPI_TRANSMIT,
+        .port  = NULL,
+        .pin   = Size,
+        .value = Timeout,
+        .extra = hspi
+    });
+    return HAL_OK;
+}
+
+/* Stub for platform_noos_stm32.c GPIO functions */
+void hal_set_gpio_by_index(uint8_t idx, uint8_t value) {
+    (void)idx; (void)value;
+}
+
 /* ========================= Mock stm32_spi_ops ===================== */
 
 /* Stub SPI platform ops -- real adf4382a_manager.c references &stm32_spi_ops.

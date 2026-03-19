@@ -98,6 +98,8 @@ wire fft_ready;
 reg [DATA_WIDTH-1:0] fft_input_i;
 reg [DATA_WIDTH-1:0] fft_input_q;
 reg signed [31:0] mult_i, mult_q;  // 32-bit to avoid overflow
+reg signed [DATA_WIDTH-1:0] window_val_reg;   // BREG pipeline stage
+reg signed [31:0] mult_i_raw, mult_q_raw;     // MREG pipeline stage
 
 reg fft_input_valid;
 reg fft_input_last;
@@ -280,61 +282,37 @@ always @(posedge clk or negedge reset_n) begin
             S_LOAD_FFT: begin
                 fft_start <= 0;
                 
-                // Pipeline alignment (after S_PRE_READ primed the BRAM):
+                // Pipeline alignment (after S_PRE_READ primed the BRAM
+                // and pre-registered window_val_reg = window_coeff[0]):
                 //
-                // At cycle k (fft_sample_counter = k, k = 0..31):
-                //   mem_rdata_i = data[chirp=k][rbin]  (from addr presented
-                //                 LAST cycle: read_doppler_index was k)
-                //   We compute: mult_i <= mem_rdata_i * window_coeff[k]
-                //   We capture: fft_input_i <= (prev_mult_i + round) >>> 15
-                //   We present: BRAM addr for chirp k+1 (for next cycle)
+                // With DSP48 BREG+MREG pipelining, data flows through:
+                //   sub=0: multiply mem_rdata * window_val_reg -> mult_i_raw
+                //          pre-register window_coeff[1] into window_val_reg
+                //   sub=1: MREG capture mult_i_raw -> mult_i (sample 0)
+                //          new multiply for sample 1
+                //   sub=2..DOPPLER_FFT_SIZE+1: steady state —
+                //          fft_input = rounding(mult_i), mult_i = mult_i_raw,
+                //          mult_i_raw = new multiply, window_val_reg = next coeff
                 //
-                // For k=0: fft_input_i captures the stale mult_i (= 0 from
-                //          reset or previous rbin's flush).  This is WRONG
-                //          for a naive implementation.  Instead, we use a
-                //          sub-counter approach:
-                //
-                //   sub=0 (pre-multiply): We have mem_rdata_i = data[0].
-                //         Compute mult_i = data[0] * window[0].
-                //         Do NOT assert fft_input_valid yet.
-                //         Present BRAM addr for chirp 1.
-                //
-                //   sub=1..31 (normal): mem_rdata_i = data[sub].
-                //         fft_input_i = (prev mult) >>> 15  -> VALID
-                //         mult_i = data[sub] * window[sub]
-                //         Present BRAM addr for chirp sub+1.
-                //
-                //   sub=32 (flush): No new BRAM data needed.
-                //         fft_input_i = (mult from sub=31) >>> 15  -> VALID, LAST
-                //         Transition to S_FFT_WAIT.
-                //
-                // We reuse fft_sample_counter as the sub-counter (0..32).
+                // fft_input_valid asserted at sub=2..DOPPLER_FFT_SIZE+1
+                // fft_input_last  asserted at sub=DOPPLER_FFT_SIZE+1
 
                 // read_doppler_index updates moved to Block 2 (sync reset)
-                if (fft_sample_counter == 0) begin
-                    // Sub 0: pre-multiply.  mem_rdata_i = data[chirp=0][rbin].
-                    // (mult_i/mult_q computed in Block 2)
-                    // Present BRAM addr for chirp 2 (sub=1 reads chirp 1
-                    // from the BRAM read we triggered in S_PRE_READ;
-                    // we need chirp 2 ready for sub=2).
-                    fft_sample_counter <= 1;
-                end else if (fft_sample_counter <= DOPPLER_FFT_SIZE) begin
-                    // Sub 1..32
+                if (fft_sample_counter <= 1) begin
+                    // Sub 0..1: pipeline priming — no valid FFT data yet
+                    fft_sample_counter <= fft_sample_counter + 1;
+                end else if (fft_sample_counter <= DOPPLER_FFT_SIZE + 1) begin
+                    // Sub 2..DOPPLER_FFT_SIZE+1: steady state
                     // (fft_input_i/fft_input_q captured in Block 2)
                     fft_input_valid <= 1;
 
-                    if (fft_sample_counter == DOPPLER_FFT_SIZE) begin
-                        // Sub 32: flush last sample
+                    if (fft_sample_counter == DOPPLER_FFT_SIZE + 1) begin
+                        // Last sample: flush
                         fft_input_last <= 1;
                         state <= S_FFT_WAIT;
                         fft_sample_counter <= 0;
                         processing_timeout <= 1000;
                     end else begin
-                        // Sub 1..31: also compute new mult from current BRAM data
-                        // (mult_i/mult_q computed in Block 2)
-                        // Advance BRAM read to chirp fft_sample_counter+2
-                        // (so data is ready two cycles later when we need it)
-                        // Clamp to DOPPLER_FFT_SIZE-1 to prevent OOB memory read
                         fft_sample_counter <= fft_sample_counter + 1;
                     end
                 end
@@ -395,6 +373,9 @@ always @(posedge clk) begin
         mem_wdata_q <= 0;
         mult_i      <= 0;
         mult_q      <= 0;
+        mult_i_raw     <= 0;
+        mult_q_raw     <= 0;
+        window_val_reg <= 0;
         fft_input_i <= 0;
         fft_input_q <= 0;
         read_range_bin     <= 0;
@@ -436,39 +417,63 @@ always @(posedge clk) begin
                 // Advance read_doppler_index to 1 so next BRAM read
                 // fetches chirp 1
                 read_doppler_index <= 1;
+                // BREG priming: pre-register window coeff for sample 0
+                // so it is ready when S_LOAD_FFT sub=0 performs the multiply
+                window_val_reg <= $signed(window_coeff[0]);
             end
 
             S_LOAD_FFT: begin
                 if (fft_sample_counter == 0) begin
-                    // Sub 0: pre-multiply.  mem_rdata_i = data[chirp=0][rbin].
-                    mult_i <= $signed(mem_rdata_i) *
-                                   $signed(window_coeff[0]);
-                    mult_q <= $signed(mem_rdata_q) *
-                                   $signed(window_coeff[0]);
+                    // Pipe stage 1: multiply using pre-registered BREG value
+                    // mem_rdata_i = data[chirp=0][rbin] (primed by S_PRE_READ)
+                    mult_i_raw <= $signed(mem_rdata_i) * window_val_reg;
+                    mult_q_raw <= $signed(mem_rdata_q) * window_val_reg;
+                    // Pre-register next window coeff (sample 1)
+                    window_val_reg <= $signed(window_coeff[1]);
                     // Present BRAM addr for chirp 2
                     read_doppler_index <= (2 < DOPPLER_FFT_SIZE) ? 2
                                           : DOPPLER_FFT_SIZE - 1;
-                end else if (fft_sample_counter <= DOPPLER_FFT_SIZE) begin
-                    // Sub 1..32: capture previous mult into fft_input
+                end else if (fft_sample_counter == 1) begin
+                    // Pipe stage 2 (MREG): capture sample 0 multiply result
+                    mult_i <= mult_i_raw;
+                    mult_q <= mult_q_raw;
+                    // Multiply sample 1 using registered window value
+                    mult_i_raw <= $signed(mem_rdata_i) * window_val_reg;
+                    mult_q_raw <= $signed(mem_rdata_q) * window_val_reg;
+                    // Pre-register next window coeff (sample 2)
+                    if (2 < DOPPLER_FFT_SIZE)
+                        window_val_reg <= $signed(window_coeff[2]);
+                    // Advance BRAM read to chirp 3
+                    if (3 < DOPPLER_FFT_SIZE)
+                        read_doppler_index <= 3;
+                    else
+                        read_doppler_index <= DOPPLER_FFT_SIZE - 1;
+                end else if (fft_sample_counter <= DOPPLER_FFT_SIZE + 1) begin
+                    // Sub 2..DOPPLER_FFT_SIZE+1: steady state
+                    // Capture rounding into fft_input from MREG output
                     fft_input_i <= (mult_i + (1 << 14)) >>> 15;
                     fft_input_q <= (mult_q + (1 << 14)) >>> 15;
+                    // MREG: capture multiply result
+                    mult_i <= mult_i_raw;
+                    mult_q <= mult_q_raw;
 
-                    if (fft_sample_counter == DOPPLER_FFT_SIZE) begin
-                        // Sub 32: flush — reset read index to prevent
-                        // stale OOB address on BRAM read port
-                        read_doppler_index <= 0;
-                    end else begin
-                        // Sub 1..31: also compute new mult from current BRAM data
-                        // mem_rdata_i = data[chirp = fft_sample_counter][rbin]
-                        mult_i <= $signed(mem_rdata_i) *
-                                       $signed(window_coeff[fft_sample_counter]);
-                        mult_q <= $signed(mem_rdata_q) *
-                                       $signed(window_coeff[fft_sample_counter]);
-                        // Advance BRAM read to chirp fft_sample_counter+2
+                    if (fft_sample_counter <= DOPPLER_FFT_SIZE - 1) begin
+                        // New multiply from current BRAM data
+                        mult_i_raw <= $signed(mem_rdata_i) * window_val_reg;
+                        mult_q_raw <= $signed(mem_rdata_q) * window_val_reg;
+                        // Pre-register next window coeff (clamped)
+                        if (fft_sample_counter + 1 < DOPPLER_FFT_SIZE)
+                            window_val_reg <= $signed(window_coeff[fft_sample_counter + 1]);
+                        // Advance BRAM read
                         if (fft_sample_counter + 2 < DOPPLER_FFT_SIZE)
                             read_doppler_index <= fft_sample_counter + 2;
                         else
                             read_doppler_index <= DOPPLER_FFT_SIZE - 1;
+                    end
+
+                    if (fft_sample_counter == DOPPLER_FFT_SIZE + 1) begin
+                        // Flush complete — reset read index
+                        read_doppler_index <= 0;
                     end
                 end
             end

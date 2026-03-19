@@ -20,7 +20,7 @@ int32_t platform_spi_write_and_read(void *desc, uint8_t *data, uint16_t len)
     SPI_HandleTypeDef *hdl = (SPI_HandleTypeDef*)desc;
     if (!hdl) return -1;
     /* ADI no-OS SPI wrappers often do full-duplex transfers */
-    if (HAL_SPI_Transmit(hdl, data, len, HAL_MAX_DELAY) != HAL_OK)
+    if (HAL_SPI_TransmitReceive(hdl, data, data, len, HAL_MAX_DELAY) != HAL_OK)
         return -1;
     return 0;
 }

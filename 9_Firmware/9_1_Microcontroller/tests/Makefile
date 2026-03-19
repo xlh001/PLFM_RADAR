@@ -30,6 +30,10 @@ MOCK_OBJS := $(MOCK_SRCS:.c=.o)
 # Real source compiled as object (for tests that need it)
 REAL_OBJ  := adf4382a_manager.o
 
+# Platform source compiled with shim headers
+PLATFORM_SRC := ../9_1_1_C_Cpp_Libraries/platform_noos_stm32.c
+PLATFORM_OBJ := platform_noos_stm32.o
+
 # Tests that link against real adf4382a_manager.c + mocks
 TESTS_WITH_REAL := test_bug1_timed_sync_init_ordering \
                    test_bug3_timed_sync_noop \
@@ -44,9 +48,12 @@ TESTS_MOCK_ONLY := test_bug2_ad9523_double_setup \
                    test_bug7_gpio_pin_conflict \
                    test_bug8_uart_commented_out
 
-ALL_TESTS := $(TESTS_WITH_REAL) $(TESTS_MOCK_ONLY)
+# Tests that need platform_noos_stm32.o + mocks
+TESTS_WITH_PLATFORM := test_bug11_platform_spi_transmit_only
 
-.PHONY: all build test clean $(addprefix test_,bug1 bug2 bug3 bug4 bug5 bug6 bug7 bug8 bug9 bug10)
+ALL_TESTS := $(TESTS_WITH_REAL) $(TESTS_MOCK_ONLY) $(TESTS_WITH_PLATFORM)
+
+.PHONY: all build test clean $(addprefix test_,bug1 bug2 bug3 bug4 bug5 bug6 bug7 bug8 bug9 bug10 bug11)
 
 all: build test
 
@@ -54,7 +61,7 @@ build: $(ALL_TESTS)
 
 test: build
 	@echo "==============================================="
-	@echo "  Running all 10 bug tests..."
+	@echo "  Running all 11 bug tests..."
 	@echo "==============================================="
 	@pass=0; fail=0; \
 	for t in $(ALL_TESTS); do \
@@ -81,6 +88,10 @@ test: build
 $(REAL_OBJ): $(REAL_SRC) $(MOCK_OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(REAL_SRC) -o $@
 
+# Platform source compiled with shim headers
+$(PLATFORM_OBJ): $(PLATFORM_SRC) $(MOCK_OBJS)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(PLATFORM_SRC) -o $@
+
 # --- Test binary rules ---
 
 # Tests that need real adf4382a_manager.o + mocks
@@ -100,6 +111,10 @@ test_bug7_gpio_pin_conflict: test_bug7_gpio_pin_conflict.c $(MOCK_OBJS)
 
 test_bug8_uart_commented_out: test_bug8_uart_commented_out.c
 	$(CC) $(CFLAGS) -I. $< -o $@
+
+# Tests that need platform_noos_stm32.o + mocks
+$(TESTS_WITH_PLATFORM): %: %.c $(MOCK_OBJS) $(PLATFORM_OBJ)
+	$(CC) $(CFLAGS) $(INCLUDES) $< $(MOCK_OBJS) $(PLATFORM_OBJ) -o $@
 
 # --- Individual test targets ---
 
@@ -132,6 +147,9 @@ test_bug9: test_bug9_platform_ops_null
 
 test_bug10: test_bug10_spi_cs_not_toggled
 	./test_bug10_spi_cs_not_toggled
+
+test_bug11: test_bug11_platform_spi_transmit_only
+	./test_bug11_platform_spi_transmit_only
 
 # --- Clean ---
 
