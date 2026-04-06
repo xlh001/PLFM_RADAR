@@ -5,8 +5,11 @@
 #
 # Usage: vivado -mode batch -source run_cdc_and_netlist.tcl
 
-set project_dir "/home/jason-stone/PLFM_RADAR_work/vivado_project"
-set report_dir  "${project_dir}/reports_impl"
+set script_dir   [file dirname [file normalize [info script]]]
+set project_root [file normalize [file join $script_dir ".."]]
+set project_dir  [file join $project_root "build"]
+set report_dir   "${project_dir}/reports_impl"
+file mkdir $report_dir
 
 # Open the routed checkpoint
 open_checkpoint ${project_dir}/aeris10_radar.runs/impl_1/radar_system_top_routed.dcp

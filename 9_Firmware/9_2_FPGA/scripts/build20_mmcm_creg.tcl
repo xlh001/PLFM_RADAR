@@ -26,8 +26,8 @@
 #
 # Usage:
 #   vivado -mode batch -source build20_mmcm_creg.tcl \
-#     -log ~/PLFM_RADAR_work/vivado_project/build20.log \
-#     -journal ~/PLFM_RADAR_work/vivado_project/build20.jou
+#     -log build/build20.log \
+#     -journal build/build20.jou
 #
 # Author: auto-generated for Jason Stone
 # Date:   2026-03-19
@@ -38,8 +38,10 @@
 # ==============================================================================
 
 set project_name    "aeris10_radar"
-set project_dir     "/home/jason-stone/PLFM_RADAR_work/vivado_project"
-set rtl_dir         "/home/jason-stone/PLFM_RADAR_work/PLFM_RADAR/9_Firmware/9_2_FPGA"
+set script_dir      [file dirname [file normalize [info script]]]
+set project_root    [file normalize [file join $script_dir ".."]]
+set project_dir     [file join $project_root "build"]
+set rtl_dir         $project_root
 set top_module      "radar_system_top"
 set fpga_part       "xc7a200tfbg484-2"
 set report_dir      "${project_dir}/reports_build20"
@@ -75,7 +77,6 @@ set rtl_files [list \
     "${rtl_dir}/adc_clk_mmcm.v" \
     "${rtl_dir}/ad9484_interface_400m.v" \
     "${rtl_dir}/cdc_modules.v" \
-    "${rtl_dir}/chirp_lut_init.v" \
     "${rtl_dir}/chirp_memory_loader_param.v" \
     "${rtl_dir}/cic_decimator_4x_enhanced.v" \
     "${rtl_dir}/dac_interface_single.v" \
@@ -83,13 +84,9 @@ set rtl_files [list \
     "${rtl_dir}/ddc_input_interface.v" \
     "${rtl_dir}/doppler_processor.v" \
     "${rtl_dir}/edge_detector.v" \
-    "${rtl_dir}/fft_1024_forward.v" \
-    "${rtl_dir}/fft_1024_inverse.v" \
     "${rtl_dir}/fir_lowpass.v" \
     "${rtl_dir}/frequency_matched_filter.v" \
     "${rtl_dir}/latency_buffer.v" \
-    "${rtl_dir}/level_shifter_interface.v" \
-    "${rtl_dir}/lvds_to_cmos_400m.v" \
     "${rtl_dir}/matched_filter_multi_segment.v" \
     "${rtl_dir}/matched_filter_processing_chain.v" \
     "${rtl_dir}/nco_400m_enhanced.v" \
@@ -99,9 +96,12 @@ set rtl_files [list \
     "${rtl_dir}/radar_system_top.v" \
     "${rtl_dir}/radar_transmitter.v" \
     "${rtl_dir}/range_bin_decimator.v" \
+    "${rtl_dir}/rx_gain_control.v" \
+    "${rtl_dir}/mti_canceller.v" \
+    "${rtl_dir}/cfar_ca.v" \
+    "${rtl_dir}/fpga_self_test.v" \
     "${rtl_dir}/usb_data_interface.v" \
-    "${rtl_dir}/usb_packet_analyzer.v" \
-    "${rtl_dir}/xfft_32.v" \
+    "${rtl_dir}/xfft_16.v" \
     "${rtl_dir}/fft_engine.v" \
 ]
 
@@ -124,8 +124,8 @@ foreach f $mem_files {
 }
 
 # Add constraints — main production XDC + MMCM supplementary XDC (FIXED)
-add_files -fileset constrs_1 -norecurse "${project_dir}/synth_only.xdc"
-add_files -fileset constrs_1 -norecurse "${rtl_dir}/constraints/adc_clk_mmcm.xdc"
+add_files -fileset constrs_1 -norecurse [file join $project_root "constraints" "xc7a200t_fbg484.xdc"]
+add_files -fileset constrs_1 -norecurse [file join $project_root "constraints" "adc_clk_mmcm.xdc"]
 
 set_property top $top_module [current_fileset]
 set_property verilog_define {FFT_XPM_BRAM} [current_fileset]

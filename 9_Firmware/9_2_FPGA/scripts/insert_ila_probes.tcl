@@ -32,9 +32,11 @@
 # 0. Configuration — all paths and parameters in one place
 # ==============================================================================
 
-set project_base   "/home/jason-stone/PLFM_RADAR_work/vivado_project"
+set script_dir     [file dirname [file normalize [info script]]]
+set project_root   [file normalize [file join $script_dir ".."]]
+set project_base   [file join $project_root "build"]
 set synth_dcp      "${project_base}/aeris10_radar.runs/synth_1/radar_system_top.dcp"
-set synth_xdc      "${project_base}/synth_only.xdc"
+set synth_xdc      [file join $project_root "constraints" "xc7a200t_fbg484.xdc"]
 set output_dir     "${project_base}/aeris10_radar.runs/impl_ila"
 set top_module     "radar_system_top"
 set part           "xc7a200tfbg484-2"

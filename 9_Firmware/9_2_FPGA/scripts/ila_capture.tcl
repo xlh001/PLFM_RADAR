@@ -34,7 +34,10 @@
 
 set default_server   "localhost"
 set default_port     3121
-set default_ltx      "/home/jason-stone/PLFM_RADAR_work/vivado_project/bitstream/radar_system_top.ltx"
+set script_dir       [file dirname [file normalize [info script]]]
+set project_root     [file normalize [file join $script_dir ".."]]
+set default_ltx      [file join $project_root "build" "aeris10_radar.runs" "impl_ila" "radar_system_top.ltx"]
+set default_output_base [file join $project_root "build" "captures"]
 set default_depth    4096
 set default_timeout  30
 
@@ -108,7 +111,7 @@ proc log_kv {key value} {
 
 proc parse_args {} {
     global argc argv
-    global default_server default_port default_ltx default_depth default_timeout
+    global default_server default_port default_ltx default_output_base default_depth default_timeout
     global hw_server_host hw_server_port probes_path capture_depth trigger_timeout
     global capture_scenario use_immediate output_dir
 
@@ -185,7 +188,7 @@ proc parse_args {} {
     # Auto-generate timestamped output directory if not specified
     if {$output_dir eq ""} {
         set timestamp [clock format [clock seconds] -format {%Y%m%d_%H%M%S}]
-        set output_dir "/home/jason-stone/PLFM_RADAR_work/vivado_project/captures/ila_${capture_scenario}_${timestamp}"
+        set output_dir [file join $default_output_base "ila_${capture_scenario}_${timestamp}"]
     }
 }
 

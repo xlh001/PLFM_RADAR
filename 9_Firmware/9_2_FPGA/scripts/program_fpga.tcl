@@ -25,8 +25,10 @@
 
 set default_server   "localhost"
 set default_port     3121
-set default_bit      "/home/jason-stone/PLFM_RADAR_work/vivado_project/bitstream/radar_system_top.bit"
-set default_ltx      "/home/jason-stone/PLFM_RADAR_work/vivado_project/bitstream/radar_system_top.ltx"
+set script_dir       [file dirname [file normalize [info script]]]
+set project_root     [file normalize [file join $script_dir ".."]]
+set default_bit      [file join $project_root "build" "bitstream" "radar_system_top_build21.bit"]
+set default_ltx      [file join $project_root "build" "aeris10_radar.runs" "impl_ila" "radar_system_top.ltx"]
 set expected_part    "xc7a200t"
 set expected_pkg     "fbg484"
 
