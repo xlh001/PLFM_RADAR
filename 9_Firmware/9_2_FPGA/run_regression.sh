@@ -67,7 +67,7 @@ PROD_RTL=(
     matched_filter_processing_chain.v
     range_bin_decimator.v
     doppler_processor.v
-    xfft_32.v
+    xfft_16.v
     fft_engine.v
     usb_data_interface.v
     edge_detector.v
@@ -369,7 +369,7 @@ run_test "Chirp Contract" \
 
 run_test "Doppler Processor (DSP48)" \
     tb/tb_doppler_reg.vvp \
-    tb/tb_doppler_cosim.v doppler_processor.v xfft_32.v fft_engine.v
+    tb/tb_doppler_cosim.v doppler_processor.v xfft_16.v fft_engine.v
 
 run_test "Threshold Detector (detection bugs)" \
     tb/tb_threshold_detector.vvp \
@@ -414,7 +414,7 @@ if [[ "$QUICK" -eq 0 ]]; then
         cdc_modules.v fir_lowpass.v ddc_input_interface.v \
         chirp_memory_loader_param.v latency_buffer.v \
         matched_filter_multi_segment.v matched_filter_processing_chain.v \
-        range_bin_decimator.v doppler_processor.v xfft_32.v fft_engine.v \
+        range_bin_decimator.v doppler_processor.v xfft_16.v fft_engine.v \
         rx_gain_control.v mti_canceller.v
 
     # Golden compare
@@ -426,7 +426,7 @@ if [[ "$QUICK" -eq 0 ]]; then
         cdc_modules.v fir_lowpass.v ddc_input_interface.v \
         chirp_memory_loader_param.v latency_buffer.v \
         matched_filter_multi_segment.v matched_filter_processing_chain.v \
-        range_bin_decimator.v doppler_processor.v xfft_32.v fft_engine.v \
+        range_bin_decimator.v doppler_processor.v xfft_16.v fft_engine.v \
         rx_gain_control.v mti_canceller.v
 
     # Full system top (monitoring-only, legacy)
@@ -439,7 +439,7 @@ if [[ "$QUICK" -eq 0 ]]; then
         cdc_modules.v fir_lowpass.v ddc_input_interface.v \
         chirp_memory_loader_param.v latency_buffer.v \
         matched_filter_multi_segment.v matched_filter_processing_chain.v \
-        range_bin_decimator.v doppler_processor.v xfft_32.v fft_engine.v \
+        range_bin_decimator.v doppler_processor.v xfft_16.v fft_engine.v \
         usb_data_interface.v edge_detector.v radar_mode_controller.v \
         rx_gain_control.v cfar_ca.v mti_canceller.v fpga_self_test.v
 
@@ -453,7 +453,7 @@ if [[ "$QUICK" -eq 0 ]]; then
         cdc_modules.v fir_lowpass.v ddc_input_interface.v \
         chirp_memory_loader_param.v latency_buffer.v \
         matched_filter_multi_segment.v matched_filter_processing_chain.v \
-        range_bin_decimator.v doppler_processor.v xfft_32.v fft_engine.v \
+        range_bin_decimator.v doppler_processor.v xfft_16.v fft_engine.v \
         usb_data_interface.v edge_detector.v radar_mode_controller.v \
         rx_gain_control.v cfar_ca.v mti_canceller.v fpga_self_test.v
 else
@@ -472,10 +472,6 @@ run_test "FFT Engine" \
     tb/tb_fft_reg.vvp \
     tb/tb_fft_engine.v fft_engine.v
 
-run_test "XFFT-32 Wrapper" \
-    tb/tb_xfft_reg.vvp \
-    tb/tb_xfft_32.v xfft_32.v fft_engine.v
-
 run_test "NCO 400MHz" \
     tb/tb_nco_reg.vvp \
     tb/tb_nco_400m.v nco_400m_enhanced.v
@@ -487,7 +483,7 @@ run_test "FIR Lowpass" \
 run_test "Matched Filter Chain" \
     tb/tb_mf_reg.vvp \
     tb/tb_matched_filter_processing_chain.v matched_filter_processing_chain.v \
-    xfft_32.v fft_engine.v chirp_memory_loader_param.v
+    fft_engine.v chirp_memory_loader_param.v
 
 echo ""
 

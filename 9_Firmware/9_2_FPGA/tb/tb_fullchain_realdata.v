@@ -7,7 +7,7 @@
  * (post-range-FFT, 32 chirps x 1024 bins) through:
  *
  *   range_bin_decimator (peak detection, 1024→64)
- *     → doppler_processor_optimized (Hamming + 32-pt FFT)
+ *     → doppler_processor_optimized (Hamming + dual 16-pt FFT)
  *
  * and compares the Doppler output bit-for-bit against the Python golden
  * reference that models the same chain (golden_reference.py).
@@ -27,7 +27,7 @@
  *   iverilog -Wall -DSIMULATION -g2012 \
  *     -o tb/tb_fullchain_realdata.vvp \
  *     tb/tb_fullchain_realdata.v \
- *     range_bin_decimator.v doppler_processor.v xfft_32.v fft_engine.v
+ *     range_bin_decimator.v doppler_processor.v xfft_16.v fft_engine.v
  *
  * Run from: 9_Firmware/9_2_FPGA/
  *   vvp tb/tb_fullchain_realdata.vvp
@@ -243,7 +243,7 @@ initial begin
     $display("============================================================");
     $display("  Full-Chain Real-Data Co-Simulation");
     $display("  range_bin_decimator (peak, 1024->64)");
-    $display("    -> doppler_processor_optimized (Hamming + 32-pt FFT)");
+    $display("    -> doppler_processor_optimized (Hamming + dual 16-pt FFT)");
     $display("  ADI CN0566 Phaser 10.525 GHz X-band FMCW");
     $display("  Input:    %0d chirps x %0d range FFT bins = %0d samples",
              CHIRPS, INPUT_BINS, TOTAL_INPUT_SAMPLES);

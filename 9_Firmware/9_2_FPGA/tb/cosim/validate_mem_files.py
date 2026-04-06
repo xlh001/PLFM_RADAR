@@ -30,7 +30,7 @@ T_LONG_CHIRP = 30e-6      # 30 us long chirp
 T_SHORT_CHIRP = 0.5e-6    # 0.5 us short chirp
 CIC_DECIMATION = 4
 FFT_SIZE = 1024
-DOPPLER_FFT_SIZE = 32
+DOPPLER_FFT_SIZE = 16
 LONG_CHIRP_SAMPLES = int(T_LONG_CHIRP * FS_SYS)  # 3000 at 100 MHz
 
 # Overlap-save parameters
@@ -84,7 +84,7 @@ def test_structural():
     expected = {
         # FFT twiddle files (quarter-wave cosine ROMs)
         'fft_twiddle_1024.mem': {'lines': 256, 'desc': '1024-pt FFT quarter-wave cos ROM'},
-        'fft_twiddle_32.mem':   {'lines': 8,   'desc': '32-pt FFT quarter-wave cos ROM'},
+        'fft_twiddle_16.mem':   {'lines': 4,   'desc': '16-pt FFT quarter-wave cos ROM'},
         # Long chirp segments (4 segments x 1024 samples each)
         'long_chirp_seg0_i.mem': {'lines': 1024, 'desc': 'Long chirp seg 0 I'},
         'long_chirp_seg0_q.mem': {'lines': 1024, 'desc': 'Long chirp seg 0 Q'},
@@ -145,13 +145,13 @@ def test_twiddle_1024():
     print(f"  Max twiddle error: {max_err} LSB across {len(vals)} entries")
 
 
-def test_twiddle_32():
-    print("\n=== TEST 2b: FFT Twiddle 32 Validation ===")
-    vals = read_mem_hex('fft_twiddle_32.mem')
+def test_twiddle_16():
+    print("\n=== TEST 2b: FFT Twiddle 16 Validation ===")
+    vals = read_mem_hex('fft_twiddle_16.mem')
 
     max_err = 0
-    for k in range(min(8, len(vals))):
-        angle = 2.0 * math.pi * k / 32.0
+    for k in range(min(4, len(vals))):
+        angle = 2.0 * math.pi * k / 16.0
         expected = int(round(math.cos(angle) * 32767.0))
         expected = max(-32768, min(32767, expected))
         actual = vals[k]
@@ -160,13 +160,13 @@ def test_twiddle_32():
             max_err = err
 
     check(max_err <= 1,
-          f"fft_twiddle_32.mem: max twiddle error = {max_err} LSB (tolerance: 1)")
+          f"fft_twiddle_16.mem: max twiddle error = {max_err} LSB (tolerance: 1)")
     print(f"  Max twiddle error: {max_err} LSB across {len(vals)} entries")
 
-    # Print all 8 entries for reference
-    print("  Twiddle 32 entries:")
-    for k in range(min(8, len(vals))):
-        angle = 2.0 * math.pi * k / 32.0
+    # Print all 4 entries for reference
+    print("  Twiddle 16 entries:")
+    for k in range(min(4, len(vals))):
+        angle = 2.0 * math.pi * k / 16.0
         expected = int(round(math.cos(angle) * 32767.0))
         print(f"    k={k}: file=0x{vals[k] & 0xFFFF:04x} ({vals[k]:6d}), "
               f"expected=0x{expected & 0xFFFF:04x} ({expected:6d}), "
@@ -605,7 +605,7 @@ def main():
 
     test_structural()
     test_twiddle_1024()
-    test_twiddle_32()
+    test_twiddle_16()
     test_long_chirp()
     test_short_chirp()
     test_chirp_vs_model()

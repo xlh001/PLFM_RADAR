@@ -9,7 +9,7 @@
  *
  *   range_bin_decimator (peak detection, 1024->64)
  *     -> mti_canceller (2-pulse, mti_enable=1)
- *       -> doppler_processor_optimized (Hamming + 32-pt FFT)
+ *       -> doppler_processor_optimized (Hamming + dual 16-pt FFT)
  *         -> DC notch filter (width=2, inline logic)
  *           -> cfar_ca (CA mode, guard=2, train=8, alpha=0x30)
  *
@@ -41,7 +41,7 @@
  *     -o tb/tb_fullchain_mti_cfar_realdata.vvp \
  *     tb/tb_fullchain_mti_cfar_realdata.v \
  *     range_bin_decimator.v mti_canceller.v doppler_processor.v \
- *     xfft_32.v fft_engine.v cfar_ca.v
+ *     xfft_16.v fft_engine.v cfar_ca.v
  *
  * Run from: 9_Firmware/9_2_FPGA/
  *   vvp tb/tb_fullchain_mti_cfar_realdata.vvp
@@ -375,7 +375,7 @@ initial begin
     $display("  Full-Chain Real-Data Co-Simulation (MTI + CFAR)");
     $display("  range_bin_decimator (peak, 1024->64)");
     $display("    -> mti_canceller (2-pulse, enable=1)");
-    $display("      -> doppler_processor_optimized (Hamming + 32-pt FFT)");
+    $display("      -> doppler_processor_optimized (Hamming + dual 16-pt FFT)");
     $display("        -> DC notch filter (width=%0d)", DC_NOTCH_WIDTH);
     $display("          -> cfar_ca (CA, guard=2, train=8, alpha=0x30)");
     $display("  ADI CN0566 Phaser 10.525 GHz X-band FMCW");

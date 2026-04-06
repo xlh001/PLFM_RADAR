@@ -34,7 +34,7 @@
  *     cdc_modules.v fir_lowpass.v ddc_input_interface.v \
  *     chirp_memory_loader_param.v latency_buffer.v \
  *     matched_filter_multi_segment.v matched_filter_processing_chain.v \
- *     range_bin_decimator.v doppler_processor.v xfft_32.v fft_engine.v \
+ *     range_bin_decimator.v doppler_processor.v xfft_16.v fft_engine.v \
  *     usb_data_interface.v edge_detector.v radar_mode_controller.v
  *
  * Run:

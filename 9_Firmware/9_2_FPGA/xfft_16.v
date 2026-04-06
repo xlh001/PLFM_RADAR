@@ -5,7 +5,7 @@
 // Wraps the synthesizable fft_engine (radix-2 DIT) with the AXI-Stream port
 // interface expected by the doppler_processor dual-FFT architecture.
 //
-// Identical interface to xfft_32.v but with N=16.
+// Used by the doppler_processor dual-FFT architecture (2 x 16-pt sub-frames).
 //
 // Data format: {Q[15:0], I[15:0]} packed 32-bit.
 // Config tdata[0]: 1 = forward FFT, 0 = inverse FFT.

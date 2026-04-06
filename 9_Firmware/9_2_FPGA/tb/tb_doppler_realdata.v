@@ -17,7 +17,7 @@
  * Compile:
  *   iverilog -Wall -DSIMULATION -g2012 \
  *     -o tb/tb_doppler_realdata.vvp \
- *     tb/tb_doppler_realdata.v doppler_processor.v xfft_32.v fft_engine.v
+ *     tb/tb_doppler_realdata.v doppler_processor.v xfft_16.v fft_engine.v
  *
  * Run from: 9_Firmware/9_2_FPGA/
  *   vvp tb/tb_doppler_realdata.vvp
@@ -29,7 +29,7 @@ module tb_doppler_realdata;
 // PARAMETERS
 // ============================================================================
 localparam CLK_PERIOD    = 10.0;           // 100 MHz
-localparam DOPPLER_FFT   = 32;
+localparam DOPPLER_FFT   = 32;             // Total packed Doppler bins (2 sub-frames x 16-pt FFT)
 localparam RANGE_BINS    = 64;
 localparam CHIRPS        = 32;
 localparam TOTAL_INPUTS  = CHIRPS * RANGE_BINS;  // 2048

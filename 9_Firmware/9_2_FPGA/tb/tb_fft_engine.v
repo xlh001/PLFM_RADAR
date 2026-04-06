@@ -4,7 +4,7 @@
  * tb_fft_engine.v
  *
  * Testbench for the synthesizable FFT engine.
- * Tests with N=32 first (fast), then validates key properties.
+ * Tests with N=16 (matching the dual-16 Doppler architecture).
  *
  * Test Groups:
  *   1. Impulse response: FFT of delta[0] should be all 1s
@@ -19,10 +19,10 @@
 module tb_fft_engine;
 
 // ============================================================================
-// PARAMETERS — test with 32-pt for speed
+// PARAMETERS — test with 16-pt to match dual-FFT Doppler architecture
 // ============================================================================
-localparam N      = 32;
-localparam LOG2N  = 5;
+localparam N      = 16;
+localparam LOG2N  = 4;
 localparam DATA_W = 16;
 localparam INT_W  = 32;
 localparam TW_W   = 16;
@@ -47,7 +47,7 @@ fft_engine #(
     .DATA_W(DATA_W),
     .INTERNAL_W(INT_W),
     .TWIDDLE_W(TW_W),
-    .TWIDDLE_FILE("fft_twiddle_32.mem")
+    .TWIDDLE_FILE("fft_twiddle_16.mem")
 ) dut (
     .clk(clk),
     .reset_n(reset_n),

@@ -404,9 +404,10 @@ assign range_data_valid = mti_range_valid;
 
 // ========== DOPPLER PROCESSOR ==========
 doppler_processor_optimized #(
-    .DOPPLER_FFT_SIZE(32),
+    .DOPPLER_FFT_SIZE(16),
     .RANGE_BINS(64),
-    .CHIRPS_PER_FRAME(32)  // MUST MATCH YOUR ACTUAL FRAME SIZE!
+    .CHIRPS_PER_FRAME(32),
+    .CHIRPS_PER_SUBFRAME(16)
 ) doppler_proc (
     .clk(clk),
     .reset_n(reset_n),

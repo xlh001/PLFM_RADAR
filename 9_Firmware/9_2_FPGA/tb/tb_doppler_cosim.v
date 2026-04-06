@@ -6,8 +6,8 @@
  *
  * Tests the complete Doppler processing pipeline:
  *   - Accumulates 32 chirps x 64 range bins into BRAM
- *   - Processes each range bin: Hamming window -> 32-pt FFT
- *   - Outputs 2048 samples (64 range bins x 32 Doppler bins)
+ *   - Processes each range bin: Hamming window -> dual 16-pt FFT (staggered PRF)
+ *   - Outputs 2048 samples (64 range bins x 32 packed Doppler bins)
  *
  * Validates:
  *   1. FSM state transitions (IDLE -> ACCUMULATE -> LOAD_FFT -> ... -> OUTPUT)
@@ -20,10 +20,10 @@
  * RTL output written to:  tb/cosim/rtl_doppler_<scenario>.csv
  * RTL FFT inputs written:  tb/cosim/rtl_doppler_fft_in_<scenario>.csv
  *
- * Compile (SIMULATION branch — uses behavioral xfft_32/fft_engine):
+ * Compile (SIMULATION branch — uses behavioral xfft_16/fft_engine):
  *   iverilog -g2001 -DSIMULATION \
  *     -o tb/tb_doppler_cosim.vvp \
- *     tb/tb_doppler_cosim.v doppler_processor.v xfft_32.v fft_engine.v
+ *     tb/tb_doppler_cosim.v doppler_processor.v xfft_16.v fft_engine.v
  *
  * Scenarios (use -D flags):
  *   default:              stationary target
@@ -37,7 +37,7 @@ module tb_doppler_cosim;
 // Parameters
 // ============================================================================
 localparam CLK_PERIOD    = 10.0;           // 100 MHz
-localparam DOPPLER_FFT   = 32;
+localparam DOPPLER_FFT   = 32;             // Total packed Doppler bins (2 sub-frames x 16-pt FFT)
 localparam RANGE_BINS    = 64;
 localparam CHIRPS        = 32;
 localparam TOTAL_INPUTS  = CHIRPS * RANGE_BINS;  // 2048
@@ -193,7 +193,7 @@ initial begin
     $display("Doppler Processor Co-Sim Testbench");
     $display("Scenario: %0s", SCENARIO);
     $display("Input samples: %0d  (32 chirps x 64 range bins)", TOTAL_INPUTS);
-    $display("Expected outputs: %0d (64 range bins x 32 doppler bins)",
+    $display("Expected outputs: %0d (64 range bins x 32 packed Doppler bins, dual 16-pt FFT)",
              TOTAL_OUTPUTS);
     $display("============================================================");
 
