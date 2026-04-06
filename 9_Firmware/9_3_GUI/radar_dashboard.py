@@ -78,14 +78,8 @@ class RadarDashboard:
 
     UPDATE_INTERVAL_MS = 100  # 10 Hz display refresh
 
-    # Radar parameters for physical axis labels (ADI CN0566 defaults)
-    # Config: [sample_rate=4e6, IF=1e5, RF=9.9e9, chirps=256, BW=500e6,
-    #          ramp_time=300e-6, ...]
-    SAMPLE_RATE = 4e6        # Hz — ADC sample rate (baseband)
+    # Radar parameters used for range-axis scaling.
     BANDWIDTH = 500e6        # Hz — chirp bandwidth
-    RAMP_TIME = 300e-6       # s  — chirp ramp time
-    CENTER_FREQ = 10.5e9     # Hz — X-band center frequency
-    NUM_CHIRPS_FRAME = 32    # chirps per Doppler frame
     C = 3e8                  # m/s — speed of light
 
     def __init__(self, root: tk.Tk, connection: FT601Connection,
@@ -188,15 +182,8 @@ class RadarDashboard:
         range_per_bin = range_res * 16
         max_range = range_per_bin * NUM_RANGE_BINS
 
-        # Velocity resolution: dv = lambda / (2 * N_chirps * T_chirp)
-        wavelength = self.C / self.CENTER_FREQ
-        # Max unambiguous velocity = lambda / (4 * T_chirp)
-        max_vel = wavelength / (4.0 * self.RAMP_TIME)
-        vel_per_bin = 2.0 * max_vel / NUM_DOPPLER_BINS
-        # Doppler axis: bin 0 = 0 Hz (DC), wraps at Nyquist
-        # For display: center DC, so shift axis to [-max_vel, +max_vel)
-        vel_lo = -max_vel
-        vel_hi = max_vel
+        doppler_bin_lo = 0
+        doppler_bin_hi = NUM_DOPPLER_BINS
 
         # Matplotlib figure with 3 subplots
         self.fig = Figure(figsize=(14, 7), facecolor=BG)
@@ -209,20 +196,17 @@ class RadarDashboard:
         self._rd_img = self.ax_rd.imshow(
             np.zeros((NUM_RANGE_BINS, NUM_DOPPLER_BINS)),
             aspect="auto", cmap="inferno", origin="lower",
-            extent=[vel_lo, vel_hi, 0, max_range],
+            extent=[doppler_bin_lo, doppler_bin_hi, 0, max_range],
             vmin=0, vmax=1000,
         )
         self.ax_rd.set_title("Range-Doppler Map", color=FG, fontsize=12)
-        self.ax_rd.set_xlabel("Velocity (m/s)", color=FG)
+        self.ax_rd.set_xlabel("Doppler Bin (0-15: long PRI, 16-31: short PRI)", color=FG)
         self.ax_rd.set_ylabel("Range (m)", color=FG)
         self.ax_rd.tick_params(colors=FG)
 
         # Save axis limits for coordinate conversions
-        self._vel_lo = vel_lo
-        self._vel_hi = vel_hi
         self._max_range = max_range
         self._range_per_bin = range_per_bin
-        self._vel_per_bin = vel_per_bin
 
         # CFAR detection overlay (scatter)
         self._det_scatter = self.ax_rd.scatter([], [], s=30, c=GREEN,
@@ -504,10 +488,9 @@ class RadarDashboard:
         self.lbl_detections.config(text=f"Det: {frame.detection_count}")
         self.lbl_frame.config(text=f"Frame: {frame.frame_number}")
 
-        # Update range-Doppler heatmap
-        # FFT-shift Doppler axis so DC (bin 0) is in the center
-        mag = np.fft.fftshift(frame.magnitude, axes=1)
-        det_shifted = np.fft.fftshift(frame.detections, axes=1)
+        # Update range-Doppler heatmap in raw dual-subframe bin order
+        mag = frame.magnitude
+        det_shifted = frame.detections
 
         # Stable colorscale via EMA smoothing of vmax
         frame_vmax = float(np.max(mag)) if np.max(mag) > 0 else 1.0
@@ -518,13 +501,13 @@ class RadarDashboard:
         self._rd_img.set_data(mag)
         self._rd_img.set_clim(vmin=0, vmax=stable_vmax)
 
-        # Update CFAR overlay — convert bin indices to physical coordinates
+        # Update CFAR overlay in raw Doppler-bin coordinates
         det_coords = np.argwhere(det_shifted > 0)
         if len(det_coords) > 0:
             # det_coords[:, 0] = range bin, det_coords[:, 1] = Doppler bin
             range_m = (det_coords[:, 0] + 0.5) * self._range_per_bin
-            vel_ms = self._vel_lo + (det_coords[:, 1] + 0.5) * self._vel_per_bin
-            offsets = np.column_stack([vel_ms, range_m])
+            doppler_bins = det_coords[:, 1] + 0.5
+            offsets = np.column_stack([doppler_bins, range_m])
             self._det_scatter.set_offsets(offsets)
         else:
             self._det_scatter.set_offsets(np.empty((0, 2)))

@@ -8,7 +8,8 @@
 // Single-clock design: clk is an input wire, async2sync handles async reset.
 // Each formal step = one clock edge.
 //
-// Parameters reduced: RANGE_BINS=4, CHIRPS_PER_FRAME=4, CHIRPS_PER_SUBFRAME=2, DOPPLER_FFT_SIZE=2.
+// Parameters: RANGE_BINS reduced for tractability, but the FFT/sub-frame size
+// remains 16 so the wrapper matches the real xfft_16 interface.
 // Includes full xfft_16 and fft_engine sub-modules.
 //
 // Focus: memory address bounds (highest-value finding) and state encoding.
@@ -17,12 +18,12 @@ module fv_doppler_processor (
     input wire clk
 );
 
-    // Reduced parameters for tractable BMC
-    localparam RANGE_BINS       = 4;
-    localparam CHIRPS_PER_FRAME = 4;
-    localparam CHIRPS_PER_SUBFRAME = 2;  // Dual sub-frame: 2 chirps per sub-frame
-    localparam DOPPLER_FFT_SIZE = 2;     // FFT size matches sub-frame size
-    localparam MEM_DEPTH        = RANGE_BINS * CHIRPS_PER_FRAME;  // 16
+    // Only RANGE_BINS is reduced; the FFT wrapper still expects 16 samples.
+    localparam RANGE_BINS       = 2;
+    localparam CHIRPS_PER_FRAME = 32;
+    localparam CHIRPS_PER_SUBFRAME = 16;
+    localparam DOPPLER_FFT_SIZE = 16;
+    localparam MEM_DEPTH        = RANGE_BINS * CHIRPS_PER_FRAME;
 
     // State encoding (mirrors DUT localparams)
     localparam S_IDLE       = 3'b000;
@@ -130,9 +131,11 @@ module fv_doppler_processor (
             assume(!data_valid);
     end
 
-    // new_chirp_frame must be a clean pulse (not during active processing)
+    // new_chirp_frame may assert during accumulation at the 16-chirp boundary.
+    // Only suppress it during FFT-processing states.
     always @(posedge clk) begin
-        if (reset_n && state != S_IDLE)
+        if (reset_n && (state == S_PRE_READ || state == S_LOAD_FFT ||
+                        state == S_FFT_WAIT || state == S_OUTPUT))
             assume(!new_chirp_frame);
     end
 
@@ -201,11 +204,17 @@ module fv_doppler_processor (
     end
 
     // ================================================================
-    // COVER 1: Complete processing of all range bins
+    // COVER 1: Complete processing of all range bins after a full frame was
+    // actually accumulated.
     // ================================================================
+    reg f_seen_full;
+    initial f_seen_full = 1'b0;
+    always @(posedge clk)
+        if (frame_buffer_full) f_seen_full <= 1'b1;
+
     always @(posedge clk) begin
         if (reset_n)
-            cover(frame_complete && f_past_valid);
+            cover(frame_complete && f_seen_full);
     end
 
     // ================================================================

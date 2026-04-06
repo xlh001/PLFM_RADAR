@@ -217,10 +217,11 @@ reg [5:0]  host_chirps_per_elev;      // Opcode 0x15 (default 32)
 reg        host_status_request;       // Opcode 0xFF (self-clearing pulse)
 
 // Fix 4: Doppler/chirps mismatch protection
-// DOPPLER_FFT_SIZE is compile-time (32). If host sets chirps_per_elev to a
+// DOPPLER_FRAME_CHIRPS is the fixed chirp count expected by the staggered-PRI
+// Doppler path (16 long + 16 short). If host sets chirps_per_elev to a
 // different value, Doppler accumulation is corrupted. Clamp at command decode
 // and flag the mismatch so the host knows.
-localparam DOPPLER_FFT_SIZE = 32;     // Must match doppler_processor parameter
+localparam DOPPLER_FRAME_CHIRPS = 32; // Total chirps per Doppler frame
 reg        chirps_mismatch_error;     // Set if host tried to set chirps != FFT size
 
 // Fix 7: Range-mode register (opcode 0x20)
@@ -532,16 +533,21 @@ assign rx_doppler_data_valid = rx_doppler_valid;
 // ============================================================================
 // DC NOTCH FILTER (post-Doppler-FFT, pre-CFAR)
 // ============================================================================
-// Zeros out Doppler bins within ±host_dc_notch_width of DC (bin 0).
-// In a 32-point FFT, DC is bin 0; negative Doppler wraps to bins 31,30,...
-// notch_width=1 → zero bins {0}. notch_width=2 → zero bins {0,1,31}. etc.
+// Zeros out Doppler bins within ±host_dc_notch_width of DC for BOTH
+// sub-frames in the dual 16-pt FFT architecture.
+// doppler_bin[4:0] = {sub_frame, bin[3:0]}:
+//   Sub-frame 0: bins 0-15,  DC = bin 0,  wrap = bin 15
+//   Sub-frame 1: bins 16-31, DC = bin 16, wrap = bin 31
+// notch_width=1 → zero bins {0,16}. notch_width=2 → zero bins
+// {0,1,15,16,17,31}. etc.
 // When host_dc_notch_width=0: pass-through (no zeroing).
 
 wire dc_notch_active;
 wire [4:0] dop_bin_unsigned = rx_doppler_bin;
+wire [3:0] bin_within_sf = dop_bin_unsigned[3:0];
 assign dc_notch_active = (host_dc_notch_width != 3'd0) &&
-                          (dop_bin_unsigned < {2'b0, host_dc_notch_width} ||
-                           dop_bin_unsigned > (5'd31 - {2'b0, host_dc_notch_width} + 5'd1));
+                          (bin_within_sf < {1'b0, host_dc_notch_width} ||
+                           bin_within_sf > (4'd15 - {1'b0, host_dc_notch_width} + 4'd1));
 
 // Notched Doppler data: zero I/Q when in notch zone, pass through otherwise
 wire [31:0] notched_doppler_data  = dc_notch_active ? 32'd0 : rx_doppler_output;
@@ -814,18 +820,18 @@ always @(posedge clk_100m_buf or negedge sys_reset_n) begin
                 8'h13: host_short_chirp_cycles <= usb_cmd_value;
                 8'h14: host_short_listen_cycles <= usb_cmd_value;
                 8'h15: begin
-                    // Fix 4: Clamp chirps_per_elev to DOPPLER_FFT_SIZE.
+                    // Fix 4: Clamp chirps_per_elev to the fixed Doppler frame size.
                     // If host requests a different value, clamp and set error flag.
-                    if (usb_cmd_value[5:0] > DOPPLER_FFT_SIZE[5:0]) begin
-                        host_chirps_per_elev  <= DOPPLER_FFT_SIZE[5:0];
+                    if (usb_cmd_value[5:0] > DOPPLER_FRAME_CHIRPS[5:0]) begin
+                        host_chirps_per_elev  <= DOPPLER_FRAME_CHIRPS[5:0];
                         chirps_mismatch_error <= 1'b1;
                     end else if (usb_cmd_value[5:0] == 6'd0) begin
-                        host_chirps_per_elev  <= DOPPLER_FFT_SIZE[5:0];
+                        host_chirps_per_elev  <= DOPPLER_FRAME_CHIRPS[5:0];
                         chirps_mismatch_error <= 1'b1;
                     end else begin
                         host_chirps_per_elev  <= usb_cmd_value[5:0];
                         // Clear error only if value matches FFT size exactly
-                        chirps_mismatch_error <= (usb_cmd_value[5:0] != DOPPLER_FFT_SIZE[5:0]);
+                        chirps_mismatch_error <= (usb_cmd_value[5:0] != DOPPLER_FRAME_CHIRPS[5:0]);
                     end
                 end
                 8'h16: host_gain_shift         <= usb_cmd_value[3:0];  // Fix 3: digital gain

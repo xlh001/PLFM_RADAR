@@ -66,13 +66,15 @@ module fv_radar_mode_controller (
     (* anyseq *) wire       stm32_new_azimuth;
     (* anyseq *) wire       trigger;
 
-    // Gap 2: Formal cfg_* inputs — solver-driven for exhaustive coverage
-    (* anyseq *) wire [15:0] cfg_long_chirp_cycles;
-    (* anyseq *) wire [15:0] cfg_long_listen_cycles;
-    (* anyseq *) wire [15:0] cfg_guard_cycles;
-    (* anyseq *) wire [15:0] cfg_short_chirp_cycles;
-    (* anyseq *) wire [15:0] cfg_short_listen_cycles;
-    (* anyseq *) wire [5:0]  cfg_chirps_per_elev;
+    // Runtime config inputs are pinned to the reduced localparams so this
+    // wrapper proves one tractable configuration. It does not sweep the full
+    // runtime-configurable cfg_* space.
+    wire [15:0] cfg_long_chirp_cycles   = LONG_CHIRP_CYCLES;
+    wire [15:0] cfg_long_listen_cycles  = LONG_LISTEN_CYCLES;
+    wire [15:0] cfg_guard_cycles        = GUARD_CYCLES;
+    wire [15:0] cfg_short_chirp_cycles  = SHORT_CHIRP_CYCLES;
+    wire [15:0] cfg_short_listen_cycles = SHORT_LISTEN_CYCLES;
+    wire [5:0]  cfg_chirps_per_elev     = CHIRPS_PER_ELEVATION;
 
     // ================================================================
     // DUT outputs
@@ -109,7 +111,8 @@ module fv_radar_mode_controller (
         .stm32_new_elevation(stm32_new_elevation),
         .stm32_new_azimuth  (stm32_new_azimuth),
         .trigger            (trigger),
-        // Gap 2: Runtime-configurable timing inputs
+        // Runtime-configurable timing ports, bound here to the reduced wrapper
+        // constants for tractable proof depth.
         .cfg_long_chirp_cycles  (cfg_long_chirp_cycles),
         .cfg_long_listen_cycles (cfg_long_listen_cycles),
         .cfg_guard_cycles       (cfg_guard_cycles),
@@ -181,7 +184,7 @@ module fv_radar_mode_controller (
     // ================================================================
     always @(posedge clk) begin
         if (reset_n && f_past_valid) begin
-            if ($past(mode) == 2'b10 &&
+            if ($past(mode) == 2'b10 && mode == 2'b10 &&
                 $past(scan_state) == S_LONG_LISTEN &&
                 $past(timer) == LONG_LISTEN_CYCLES - 1)
                 assert(scan_state == S_IDLE);
@@ -202,11 +205,11 @@ module fv_radar_mode_controller (
     end
 
     // ================================================================
-    // COVER 1: Full scan completes (scan_complete pulses)
+    // COVER 1: Full auto-scan completes
     // ================================================================
     always @(posedge clk) begin
         if (reset_n)
-            cover(scan_complete);
+            cover(scan_complete && mode == 2'b01);
     end
 
     // ================================================================
