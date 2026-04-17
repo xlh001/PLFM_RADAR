@@ -550,7 +550,7 @@
 <text x="3.085225" y="81.68279375" size="1.778" layer="51">GND</text>
 <text x="2.3" y="53.85" size="1.778" layer="51">GND</text>
 <text x="3.336225" y="42.247028125" size="1.778" layer="51">GND</text>
-<text x="2.25" y="11.75" size="1.778" layer="51">GND</text>
+<text x="2.99881875" y="12.58869375" size="1.778" layer="51">GND</text>
 <text x="21.75" y="12.15" size="1.778" layer="51" rot="R90">GND</text>
 <text x="37.45" y="10.05" size="1.778" layer="51" rot="R90">GND</text>
 <text x="60.5" y="9.4" size="1.778" layer="51" rot="R90">GND</text>
@@ -589,11 +589,11 @@
 <text x="248.95" y="49.2" size="1.778" layer="51" rot="R180">GND</text>
 <text x="248.85" y="66.55" size="1.778" layer="51" rot="R180">GND</text>
 <text x="248.8" y="82.9" size="1.778" layer="51" rot="R180">GND</text>
-<text x="256.35" y="101.95" size="1.778" layer="51" rot="R180">GND</text>
-<text x="249.4" y="112.5" size="1.778" layer="51" rot="R180">GND</text>
+<text x="253.964015625" y="102.099125" size="1.778" layer="51" rot="R180">GND</text>
+<text x="249.054865625" y="112.111771875" size="1.778" layer="51" rot="R180">GND</text>
 <text x="237.75" y="280.1" size="1.778" layer="51" rot="R270">GND</text>
 <text x="199.75" y="273.55" size="1.778" layer="51" rot="R270">GND</text>
-<text x="188.45" y="272.75" size="1.778" layer="51" rot="R270">GND</text>
+<text x="188.539503125" y="273.018421875" size="1.778" layer="51" rot="R270">GND</text>
 <text x="177.95" y="272.75" size="1.778" layer="51" rot="R270">GND</text>
 <text x="113.4" y="281.65" size="1.778" layer="51" rot="R270">GND</text>
 <text x="2.992190625" y="248.58331875" size="1.778" layer="51">GND</text>
@@ -635,13 +635,13 @@
 <wire x1="161.6" y1="158.7" x2="156.95" y2="163.4" width="2.54" layer="29"/>
 <wire x1="170.1" y1="150.2" x2="165.45" y2="154.9" width="2.54" layer="29"/>
 <text x="125.137784375" y="269.740521875" size="1.778" layer="51" rot="R90">+5V0_PA_1</text>
-<text x="185.45" y="267.2" size="1.778" layer="51" rot="R90">-3V4</text>
-<text x="196.5" y="267.4" size="1.778" layer="51" rot="R90">+3V4</text>
+<text x="182.675396875" y="267.73684375" size="1.778" layer="51" rot="R90">-3V4</text>
+<text x="193.277878125" y="266.86315625" size="1.778" layer="51" rot="R90">+3V4</text>
 <text x="207.4" y="267.85" size="1.778" layer="51" rot="R90">-5V0_ADAR12</text>
 <text x="188.75" y="289.05" size="1.3" layer="51" rot="R45">+3V3_ADAR12</text>
 <text x="248.25" y="270.6" size="1.778" layer="51" rot="R90">+5V0_PA_2</text>
-<text x="242.8" y="98.7" size="1.778" layer="51" rot="R180">+3V4</text>
-<text x="242.9" y="106.65" size="1.778" layer="51" rot="R180">-3V4</text>
+<text x="249.695853125" y="96.471690625" size="1.778" layer="51" rot="R180">+3V4</text>
+<text x="249.232640625" y="104.692303125" size="1.778" layer="51" rot="R180">-3V4</text>
 <text x="181.4" y="99.15" size="1.778" layer="51" rot="R270">-5V0_ADAR34</text>
 <text x="185.3" y="75.15" size="1.778" layer="51" rot="R270">+3V3_ADAR34</text>
 <text x="238.95" y="72.8" size="1.778" layer="51">+3V3_VDD_SW</text>
@@ -714,8 +714,8 @@
 <text x="147.05" y="25.3" size="1.778" layer="51" rot="R180">CHAN14</text>
 <text x="157.1" y="25.25" size="1.778" layer="51" rot="R180">CHAN15</text>
 <text x="167.15" y="25.35" size="1.778" layer="51" rot="R180">CHAN16</text>
-<text x="50.15" y="131.25" size="1.778" layer="51" rot="R180">SV1</text>
-<text x="43.25" y="128.5" size="1.778" layer="51" rot="R270">VOLTAGE SEQUENCING</text>
+<text x="51.802165625" y="131.052934375" size="1.778" layer="51" rot="R180">SV1</text>
+<text x="35.60243125" y="132.092775" size="1.778" layer="51" rot="R270">VOLTAGE SEQUENCING</text>
 <text x="105.55" y="106.9" size="1.2" layer="51" rot="R90">AD9523_EEPROM_SEL</text>
 <text x="107.2" y="101.85" size="1.2" layer="51" rot="R45">AD9523_STATUS0</text>
 <text x="107.25" y="99.35" size="1.2" layer="51" rot="R45">STM32_MOSI4</text>
@@ -728,20 +728,19 @@
 <text x="99.8" y="100.75" size="1.2" layer="51" rot="R225">STM32_MISO4</text>
 <text x="99.8" y="103.4" size="1.2" layer="51" rot="R225">AD9523_STATUS1</text>
 <text x="99.7" y="105.85" size="1.2" layer="51" rot="R225">GND</text>
-<text x="68.7" y="82.55" size="1.778" layer="51">JP4</text>
-<text x="64.25" y="73.85" size="1.778" layer="51" rot="R270">GND</text>
+<text x="68.73355625" y="72.201796875" size="1.778" layer="51">JP4</text>
+<text x="62.77508125" y="75.956934375" size="1" layer="51" rot="R225">GND</text>
 <text x="56.95" y="82.75" size="1.778" layer="51">JP9</text>
-<text x="37.85" y="78.6" size="1.778" layer="51" rot="R90">JP2</text>
-<text x="43.95" y="88.9" size="1.778" layer="51">JP8</text>
-<text x="29.1" y="93.2" size="1.778" layer="51">JP7</text>
-<text x="21.75" y="85.35" size="1.778" layer="51">JP18</text>
+<text x="45.798875" y="84.61879375" size="1.778" layer="51" rot="R180">JP2</text>
+<text x="43.09716875" y="85.33433125" size="1.778" layer="51" rot="R90">JP8</text>
+<text x="29.1" y="93.2" size="1.778" layer="51">IMU</text>
+<text x="27.568784375" y="88.61074375" size="1.778" layer="51">JP18</text>
 <text x="89.3" y="75.5" size="1.778" layer="51" rot="R180">JP13</text>
 <text x="75.2" y="77" size="1.778" layer="51" rot="R270">GND</text>
-<text x="69.6" y="74.1" size="1.778" layer="51" rot="R270">GND</text>
-<text x="62.9" y="82.75" size="1.778" layer="51">JP10</text>
-<text x="53.75" y="64.4" size="1.2" layer="51" rot="R45">STEPPER_CLK+</text>
-<text x="43.9" y="78.65" size="1.778" layer="51" rot="R270">GND</text>
-<text x="53.95" y="86.4" size="1.778" layer="51">GND</text>
+<text x="62.1909375" y="71.621040625" size="1.778" layer="51">JP10</text>
+<text x="54.996875" y="70.359128125" size="1.2" layer="51">STEPPER</text>
+<text x="43.9" y="78.65" size="1.27" layer="51" rot="R270">GND</text>
+<text x="52.61158125" y="88.897171875" size="1.016" layer="51" rot="R90">GND</text>
 <text x="31.3" y="84.75" size="1.778" layer="51" rot="R270">GND</text>
 <text x="40.45" y="95.9" size="1.778" layer="51" rot="R90">GND</text>
 <rectangle x1="12.8295" y1="256.5735" x2="15.6235" y2="256.7005" layer="51"/>
@@ -5387,6 +5386,56 @@
 <text x="122.221528125" y="146.5440625" size="1.27" layer="51" rot="R315">RX 3_4</text>
 <text x="145.05015" y="114.518025" size="1.27" layer="51" rot="R45">RX 4_4</text>
 <text x="150.25345625" y="4.79933125" size="5.4864" layer="51" font="vector">www.abac-industry.com</text>
+<text x="47.269546875" y="127.64274375" size="1.27" layer="51" rot="R135">+1V0_FPGA</text>
+<text x="47.220515625" y="125.152134375" size="1.27" layer="51" rot="R135">+1V8_FPGA</text>
+<text x="47.270815625" y="122.549565625" size="1.27" layer="51" rot="R135">+3V3_FPGA</text>
+<text x="47.317503125" y="119.8292125" size="1.27" layer="51" rot="R135">+5V0_ADAR</text>
+<text x="47.30423125" y="117.319196875" size="1.27" layer="51" rot="R135">+3V3_ADAR12</text>
+<text x="47.2552" y="114.8285875" size="1.27" layer="51" rot="R135">+3V3_ADAR34</text>
+<text x="47.3055" y="112.22601875" size="1.27" layer="51" rot="R135">+3V3_ADTR</text>
+<text x="47.3521875" y="109.505665625" size="1.27" layer="51" rot="R135">+3V3_SW</text>
+<text x="47.262328125" y="107.0494875" size="1.27" layer="51" rot="R135">+3V3_VDD_SW</text>
+<text x="47.262328125" y="104.6232625" size="1.27" layer="51" rot="R135">+5V0_PA1</text>
+<text x="52.848896875" y="114.716634375" size="1.27" layer="51" rot="R315">GND</text>
+<text x="52.897928125" y="117.20724375" size="1.27" layer="51" rot="R315">+3V3_CLOCK</text>
+<text x="52.847628125" y="119.8098125" size="1.27" layer="51" rot="R315">+1V8_CLOCK</text>
+<text x="52.800940625" y="122.530165625" size="1.27" layer="51" rot="R315">+5V5_PA</text>
+<text x="52.8908" y="124.98634375" size="1.27" layer="51" rot="R315">+5V0_PA3</text>
+<text x="52.8908" y="127.41256875" size="1.27" layer="51" rot="R315">+5V0_PA2</text>
+<text x="52.866228125" y="112.238071875" size="1.27" layer="51" rot="R315">GND</text>
+<text x="52.79689375" y="109.7075125" size="1.27" layer="51" rot="R315">GND</text>
+<text x="52.7795625" y="107.038290625" size="1.27" layer="51" rot="R315">GND</text>
+<text x="52.762228125" y="104.50773125" size="1.27" layer="51" rot="R315">GND</text>
+<text x="37.741834375" y="95.9444" size="1.778" layer="51" rot="R90">+3V3</text>
+<text x="43.11376875" y="95.9444" size="1.778" layer="51" rot="R90">SCL3</text>
+<text x="45.64435" y="95.9888" size="1.778" layer="51" rot="R90">SDA3</text>
+<text x="48.232090625" y="95.98181875" size="1.016" layer="51" rot="R90">MAG_DRDY</text>
+<text x="50.801084375" y="95.879059375" size="1.016" layer="51" rot="R90">ACC_INT</text>
+<text x="52.907659375" y="95.95613125" size="1.016" layer="51" rot="R90">GYR_INT</text>
+<text x="54.502678125" y="92.739546875" size="1.778" layer="51">JP7</text>
+<text x="30.45236875" y="78.6816375" size="1.778" layer="51" rot="R90">+3V3</text>
+<text x="35.56853125" y="79.257065625" size="1.778" layer="51" rot="R90">SCL3</text>
+<text x="38.227" y="78.789975" size="1.778" layer="51" rot="R90">SDA3</text>
+<text x="39.282209375" y="78.488071875" size="1.27" layer="51" rot="R270">+3V3</text>
+<text x="41.4419875" y="78.63334375" size="1.27" layer="51" rot="R270">STM32_SWCLK</text>
+<text x="46.663971875" y="78.473509375" size="1.27" layer="51" rot="R270">STM32_SWDIO</text>
+<text x="49.16839375" y="78.5267875" size="1.27" layer="51" rot="R270">STM32_NRST</text>
+<text x="51.7793875" y="78.473509375" size="1.27" layer="51" rot="R270">STM32_SWO</text>
+<text x="53.6100625" y="82.81805625" size="1.27" layer="51" rot="R315">GND</text>
+<text x="53.75804375" y="77.6019375" size="1.27" layer="51" rot="R315">GND</text>
+<text x="53.809425" y="80.29940625" size="1.27" layer="51" rot="R315">CW+</text>
+<text x="53.520859375" y="75.467190625" size="1.27" layer="51" rot="R315">CLK+</text>
+<text x="50.081" y="88.941571875" size="1.016" layer="51" rot="R90">RX5</text>
+<text x="47.417228125" y="88.985971875" size="1.016" layer="51" rot="R90">TX5</text>
+<text x="45.019834375" y="88.675175" size="1.016" layer="51" rot="R90">+3V3</text>
+<text x="53.525646875" y="86.07393125" size="1.778" layer="51">GPS</text>
+<text x="62.34479375" y="80.785540625" size="0.9" layer="51" rot="R45">EN/DIS_RFPA_VDD</text>
+<text x="68.0472625" y="76.328084375" size="1" layer="51" rot="R225">GND</text>
+<text x="67.5982" y="80.711553125" size="0.9" layer="51" rot="R45">EN/DIS_COOLING</text>
+<text x="78.325053125" y="83.140434375" size="1.778" layer="51">ADF4382</text>
+<text x="92.67903125" y="80.894575" size="1.016" layer="51">1</text>
+<text x="92.77235625" y="78.2390125" size="1.016" layer="51">2</text>
+<text x="73.362715625" y="77.945809375" size="1.016" layer="51">14</text>
 </plain>
 <libraries>
 <library name="eagle-ltspice">
@@ -24576,8 +24625,8 @@ Your PCBWay Team
 <vertex x="114" y="112" curve="-180"/>
 </polygon>
 <polygon width="0.254" layer="1" spacing="5.08">
-<vertex x="258.75" y="116" curve="-180"/>
-<vertex x="254.75" y="112" curve="-180"/>
+<vertex x="258.9164" y="116.0208" curve="-180"/>
+<vertex x="254.9164" y="112.0208" curve="-180"/>
 </polygon>
 <polygon width="0.254" layer="1" spacing="5.08">
 <vertex x="260" y="300"/>

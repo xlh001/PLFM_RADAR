@@ -68,13 +68,13 @@ The AERIS-10 main sub-systems are:
       - Clock Generator (AD9523-1)
       - 2x Frequency Synthesizers (ADF4382)
       - 4x 4-Channel Phase Shifters (ADAR1000) for RADAR pulse sequencing
-      - 2x ADS7830 ADCs (on Power Amplifier Boards) for Idq measurement
-      - 2x DAC5578 (on Power Amplifier Boards) for Vg control
-      - GPS module for GUI map centering
+      - 2x ADS7830 8-channel I²C ADCs (Main Board, U88 @ 0x48 / U89 @ 0x4A) for 16x Idq measurement, one per PA channel, each sensed through a 5 mΩ shunt on the PA board and an INA241A3 current-sense amplifier (x50) on the Main Board
+      - 2x DAC5578 8-channel I²C DACs (Main Board, U7 @ 0x48 / U69 @ 0x49) for 16x Vg control, one per PA channel; closed-loop calibrated at boot to the target Idq
+      - GPS module (UM982) for GUI map centering and per-detection position tagging
       - GY-85 IMU for pitch/roll correction of target coordinates
       - BMP180 Barometer
       - Stepper Motor
-      - 8x ADS7830 Temperature Sensors for cooling fan control
+      - 1x ADS7830 8-channel I²C ADC (Main Board, U10) reading 8 thermistors for thermal monitoring; a single GPIO (EN_DIS_COOLING) switches the cooling fans on when any channel exceeds the threshold
       - RF switches
 
 - **16x Power Amplifier Boards** - Used only for AERIS-10E version, featuring 10Watt QPA2962 GaN amplifier for extended range
